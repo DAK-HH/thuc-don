@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thực đơn gia đình</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#2f7d5b"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7f5;--card:#fff;--tx:#1d2a24;--mut:#5d6b64;--ac:#2f7d5b;--acs:#e3f1ea;--bd:#d9dfdb;--wn:#fff4e0;--wnt:#7a4b00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#141916;--card:#1d2420;--tx:#e8eeea;--mut:#9fb0a7;--ac:#5fc08f;--acs:#22362c;--bd:#33403a;--wn:#3a2f17;--wnt:#f1c779}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#141916;--card:#1d2420;--tx:#e8eeea;--mut:#9fb0a7;--ac:#5fc08f;--acs:#22362c;--bd:#33403a;--wn:#3a2f17;--wnt:#f1c779}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 12px}h2{font-size:16px;margin:18px 0 8px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{flex:1;min-width:110px;padding:10px 8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label{font-size:12px;color:var(--mut);display:block}
+input,select{width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+.stat{background:var(--acs);border-radius:10px;padding:10px}.stat b{display:block;font-size:18px;color:var(--ac)}.stat span{font-size:12px;color:var(--mut)}
+.warn{background:var(--wn);color:var(--wnt);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:14px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{border:1px solid var(--bd);padding:7px 8px;text-align:left;vertical-align:top}
+th{background:var(--acs)}
+small{color:var(--mut)}
+ul{margin:6px 0;padding-left:20px}
+</style></head><body><main>
+<h1>🥗 Thực đơn gia đình</h1>
+<div class="tabs" id="tabs"></div>
+<div id="out"></div>
+<p><small>Ước tính tham khảo, không thay thế tư vấn của bác sĩ/chuyên gia dinh dưỡng. Món ăn là gợi ý, bạn có thể hoán đổi giữa các ngày.</small></p>
+</main>
+<script>
+var P=[{n:"Anh",t:"a",s:"m",a:30,h:170,w:70,act:1.375,goal:"keep"},
+{n:"Chị",t:"a",s:"f",a:30,h:160,w:55,act:1.375,goal:"keep"},
+{n:"Bé",t:"k"},
+{n:"🍳 Nấu gì?",t:"c"},
+{n:"🍽️ Thực đơn chung",t:"s"}];
+var SANG=["Phở gà ít bánh + 1 quả trứng luộc","Bánh mì ốp la (1 ổ nhỏ) + dưa leo","Yến mạch nấu sữa + chuối","Bún mọc ít bún, nhiều rau","Xôi (1 nắm nhỏ) + trứng cút + dưa chuột","Cháo thịt bằm + trứng","Bánh cuốn (6 miếng) + chả lụa nạc"];
+var TRUA=["Thịt nạc rim nhạt + canh bí đỏ + rau luộc","Gà luộc xé + bắp cải luộc + canh rau","Đậu phụ sốt cà + thịt nạc rim + canh rau muống","Gà kho gừng nhạt + canh khổ qua + cải xào","Bò xào ớt chuông + canh cải","Cá hấp gừng (tuỳ chọn, hoặc đổi sang gà) + canh rau ngót + đậu que luộc","Trứng đúc thịt + canh bầu + rau muống luộc"];
+var TOI=["Canh bí xanh thịt băm + trứng chưng + rau luộc","Ức gà áp chảo + salad + canh","Đậu hũ nhồi thịt sốt cà + canh rau ngót","Thịt bò xào cải + canh rau củ","Miến gà ít miến, nhiều rau","Thịt nạc luộc + cải luộc + canh","Đậu phụ sốt cà + thịt rim nhạt + canh bí luộc"];
+var PHU=["Sữa chua không đường","1 quả cam","Khoai lang hấp (1 củ nhỏ)","Sữa đậu nành không đường","1 quả chuối","1 quả táo","1 quả trứng luộc"];
+var BS=["Cháo thịt bằm rau củ","Phở/bún thái nhỏ, mềm","Bánh mì mềm + trứng chưng","Súp gà ngô","Cháo cá + bí đỏ","Mì nấu mềm + thịt bò băm","Xôi mềm + trứng"];
+var BT=["Cơm mềm + cá hấp + canh rau ngót","Cơm + thịt viên + canh bí","Cơm + trứng chưng thịt + canh rau","Cơm + tôm băm + canh mồng tơi","Cơm + gà xé nhỏ + súp lơ mềm","Cơm + đậu phụ sốt cà + thịt băm","Cơm + cá basa kho nhạt + canh bầu"];
+var BX=["Sữa chua + chuối","Bơ nghiền","Bánh flan","Cam cắt múi nhỏ","Khoai lang hấp","Sữa + bánh quy mềm","Đu đủ chín"];
+var BTOI=["Cháo/cơm nát + thịt bằm + rau","Cơm mềm + cá + canh","Cháo gà + bí đỏ","Cơm + trứng + canh rau củ","Cháo tôm + rau cải","Cơm + thịt bò băm + canh","Cháo cá hồi + súp lơ"];
+var DAYS=["T2","T3","T4","T5","T6","T7","CN"];
+var cur=4;
+function calc(p){var bmr=10*p.w+6.25*p.h-5*p.a+(p.s=="m"?5:-161),td=bmr*p.act,bmi=p.w/Math.pow(p.h/100,2),t=td,note="";
+if(p.goal=="lose"){if(bmi<23){note="BMI "+bmi.toFixed(1)+" đang ở mức bình thường/thấp, không nên ăn giảm cân. Thực đơn được tính ở mức giữ cân.";}else t=td-500}
+if(p.goal=="gain")t=td+300;
+var fl=p.s=="m"?1500:1200;if(t<fl)t=fl;
+var pr=Math.round(p.w*(p.goal=="lose"&&!note?1.2:1));
+return{bmi:bmi,td:Math.round(td),t:Math.round(t/10)*10,pr:pr,note:note}}
+function tabs(){var h="";[4,0,1,2,3].forEach(function(i){var p=P[i];h+='<button class="'+(i==cur?"on":"")+'" onclick="cur='+i+';draw()">'+p.n+'</button>'});document.getElementById("tabs").innerHTML=h}
+function fld(i,k,l,type,opts){var p=P[i],v=p[k];if(opts){var s='<select onchange="P['+i+'].'+k+'=parseFloat(this.value)||this.value;draw()">';opts.forEach(function(o){s+='<option value="'+o[0]+'"'+(v==o[0]?" selected":"")+'>'+o[1]+'</option>'});return'<div><label>'+l+'</label>'+s+'</select></div>'}
+return'<div><label>'+l+'</label><input type="number" value="'+v+'" onchange="P['+i+'].'+k+'=+this.value;draw()"></div>'}
+function adult(i){var p=P[i],c=calc(p),h='<div class="card"><div class="grid">'+
+fld(i,"a","Tuổi")+fld(i,"h","Chiều cao (cm)")+fld(i,"w","Cân nặng (kg)")+
+fld(i,"act","Vận động",0,[[1.2,"Ít (ngồi nhiều)"],[1.375,"Nhẹ"],[1.55,"Vừa"],[1.725,"Nhiều"]])+
+fld(i,"goal","Mục tiêu",0,[["lose","Giảm cân"],["keep","Giữ cân"],["gain","Tăng cân"]])+fld(i,"notom","Tránh tôm",0,[["","Không"],[1,"Có"]])+'</div>'+
+'<div class="stats"><div class="stat"><b>'+c.bmi.toFixed(1)+'</b><span>BMI</span></div><div class="stat"><b>'+c.t+'</b><span>kcal/ngày mục tiêu</span></div><div class="stat"><b>'+c.pr+' g</b><span>đạm/ngày</span></div><div class="stat"><b>'+c.td+'</b><span>kcal tiêu hao/ngày</span></div></div>'+
+(c.note?'<div class="warn">'+c.note+'</div>':"")+
+(p.goal=="lose"&&!c.note?'<div class="warn">Giảm khoảng 0,5 kg/tuần là an toàn; không nên ăn dưới '+(p.s=="m"?1500:1200)+' kcal/ngày.</div>':"")+
+'<small>Tuổi tính theo năm sinh, bạn sửa nếu cần.</small></div>';
+return h+'<p><small>Thực đơn chung của cả nhà ở tab 🍽️ Thực đơn chung; khẩu phần của '+p.n+' tính theo thông tin ở trên.</small></p>';var b={s:c.t*.25,t:c.t*.35,o:c.t*.3,p:c.t*.1};
+function rice(x){return Math.max(.5,Math.round((x-300)/150*2)/2)}
+h+='<h2>Thực đơn 7 ngày</h2><div class="card scroll"><table><tr><th></th><th>Sáng (~'+Math.round(b.s)+' kcal)</th><th>Trưa (~'+Math.round(b.t)+')</th><th>Tối (~'+Math.round(b.o)+')</th><th>Phụ (~'+Math.round(b.p)+')</th></tr>';
+for(var d=0;d<7;d++)h+='<tr><td><b>'+DAYS[d]+'</b></td><td>'+SANG[d]+'<br><small>khẩu phần ×'+(Math.round(b.s/400*4)/4)+'</small></td><td>'+TRUA[d]+'<br><small>cơm '+rice(b.t)+' chén vừa</small></td><td>'+TOI[d]+'<br><small>cơm '+rice(b.o)+' chén vừa</small></td><td>'+PHU[d]+'</td></tr>';
+h+='</table></div><ul><li>Uống đủ 1,5–2 lít nước; hạn chế nước ngọt, chiên rán, nêm mặn.</li><li>Ưu tiên ½ đĩa rau, ¼ đạm, ¼ tinh bột. 1 chén cơm vừa ≈ 150 kcal (ước tính).</li></ul>';return h}
+function kid(){var h='<div class="card"><div class="stats"><div class="stat"><b>~1000–1200</b><span>kcal/ngày</span></div><div class="stat"><b>400–500 ml</b><span>sữa/ngày</span></div></div>'+
+'<div class="warn">Thực đơn cho bé 1–3 tuổi: ăn đủ chất, không ép ăn. Theo dõi cân nặng và chiều cao theo biểu đồ WHO hoặc sổ khám; nếu bé biếng ăn hay bạn lo lắng, hãy hỏi bác sĩ nhi.</div></div>'+
+'<h2>Thực đơn 7 ngày</h2><div class="card scroll"><table><tr><th></th><th>Sáng</th><th>Trưa</th><th>Xế</th><th>Tối</th></tr>';
+for(var d=0;d<7;d++)h+='<tr><td><b>'+DAYS[d]+'</b></td><td>'+(d<6?"Ăn ở lớp":SANG[d])+'</td><td>'+(d<6?"Ăn ở lớp":TRUA[d])+'</td><td>'+BX[d]+'</td><td>'+TOI[d]+'</td></tr>';
+return h+'</table></div><ul><li>Bé ăn chung món của cả nhà: múc phần của bé ra trước khi nêm mặn, nấu mềm, thái nhỏ; phần ≈ ⅓ người lớn.</li><li>Mỗi bữa thêm 1–2 thìa cà phê dầu ăn/bơ để đủ năng lượng; đủ đạm (thịt, cá, trứng, đậu), rau và trái cây mỗi ngày.</li><li>Nêm nhạt, thái nhỏ/mềm. Tránh nho nguyên quả, hạt, kẹo cứng vì dễ nghẹn.</li><li>Không ép ăn, ăn cùng gia đình, hạn chế bánh kẹo và nước ngọt trước bữa chính.</li></ul>'}
+var ING="",WHO=0;
+var D=[["Cá hấp gừng",["cá"],150,1],["Canh chua cá",["cá","cà chua","dứa","giá"],170,1],["Gà luộc xé + bắp cải luộc",["gà","bắp cải"],220,1],["Ức gà áp chảo + salad",["gà","xà lách","cà chua","dưa leo"],240,0],["Gà kho nhạt",["gà"],250,0],["Trứng chưng thịt",["trứng","thịt heo"],210,1],["Trứng chiên rau củ",["trứng","cà rốt"],200,1],["Salad trứng, dưa leo, cà chua",["trứng","dưa leo","cà chua"],160,1],["Đậu phụ sốt cà chua",["đậu phụ","cà chua"],190,1],["Đậu phụ nhồi thịt",["đậu phụ","thịt heo"],230,1],["Canh bí đỏ nấu thịt",["bí đỏ","thịt heo"],120,1],["Canh rau ngót thịt băm",["rau ngót","thịt heo"],100,1],["Canh cải thịt băm",["cải","thịt heo"],100,1],["Cải xào tỏi",["cải"],70,1],["Canh bầu nấu thịt băm",["bầu","thịt heo"],90,1],["Tôm rim nhạt",["tôm"],150,1,1],["Canh cải nấu tôm",["cải","tôm"],100,1,1],["Canh bầu nấu tôm",["bầu","tôm"],90,1,1],["Canh khổ qua nhồi thịt",["khổ qua","thịt heo"],150,0],["Bò xào ớt chuông, hành tây",["thịt bò","ớt chuông","hành tây"],260,0],["Đậu que xào thịt",["đậu que","thịt heo"],180,1],["Thịt nạc rim nhạt",["thịt heo"],200,0],["Rau muống luộc/xào tỏi",["rau muống"],70,1],["Súp lơ luộc",["súp lơ"],50,1],["Miến gà",["gà","miến"],330,1],["Cháo thịt bằm rau củ",["gạo","thịt heo","cà rốt"],250,1],["Cháo cá bí đỏ",["gạo","cá","bí đỏ"],260,1],["Yến mạch nấu sữa + chuối",["yến mạch","sữa","chuối"],300,1],["Bánh mì ốp la",["bánh mì","trứng"],300,1],["Khoai lang hấp",["khoai lang"],130,1]];
+var SY={"thịt lợn":"thịt heo","thịt nạc":"thịt heo","nạc":"thịt heo","heo":"thịt heo","lợn":"thịt heo","bò":"thịt bò","thịt gà":"gà","ức gà":"gà","đậu hũ":"đậu phụ","tàu hũ":"đậu phụ","cà":"cà chua","khổ qua":"khổ qua","mướp đắng":"khổ qua","bông cải":"súp lơ","bông cải xanh":"súp lơ","rau ngót":"rau ngót"};
+function cook(){var o="";P.slice(0,3).forEach(function(p,i){o+='<option value="'+i+'"'+(i==WHO?" selected":"")+'>'+p.n+'</option>'});
+return '<div class="card"><label>Nguyên liệu bạn đang có (cách nhau bằng dấu phẩy)</label><textarea id="ing" rows="3" style="width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit" placeholder="VD: gà, cà chua, trứng, bí đỏ, rau muống" oninput="ING=this.value;res()">'+ING.replace(/</g,"&lt;")+'</textarea><label style="margin-top:8px">Nấu cho</label><select onchange="WHO=+this.value;res()">'+o+'</select><small>Mặc định nhà đã có dầu ăn, hành, tỏi, gừng, nước mắm, muối. Món có tôm bị ẩn nếu người đó chọn “Tránh tôm”.</small></div><div id="res"></div>'+
+'<h2>Không có đủ nguyên liệu? Đổi tương đương</h2><div class="card"><ul><li>Đạm: gà ↔ thịt nạc ↔ thịt bò ↔ đậu phụ ↔ trứng</li><li>Rau lá: rau muống ↔ các loại cải ↔ rau ngót ↔ bắp cải</li><li>Rau củ: bí đỏ ↔ cà rốt ↔ khoai lang ↔ su su</li><li>Tinh bột: cơm ↔ khoai lang ↔ bún/miến (giảm cân thì ăn ít hơn)</li><li>Món chiên có thể đổi sang luộc, hấp, áp chảo ít dầu</li></ul></div>'}
+function res(){var it=ING.toLowerCase().split(/[,;\n]+/).map(function(x){x=x.trim();return SY[x]||x}).filter(Boolean),p=P[WHO],kid=p.t=="k",h="",L=[];
+D.forEach(function(d){if(kid&&!d[3]||P[WHO].notom&&d[4])return;var m=d[1].filter(function(g){return it.some(function(x){return(" "+x+" ").indexOf(" "+g+" ")>=0})});
+if(m.length&&m.length>=Math.ceil(d[1].length/2))L.push({d:d,m:m,r:m.length/d[1].length})});
+L.sort(function(a,b){return b.r-a.r||b.m.length-a.m.length});
+var hint=kid?"Phần cho bé khoảng 1/3 người lớn, nấu mềm, nêm nhạt, thái nhỏ.":"Cơm khoảng "+Math.max(60,Math.round((calc(p).t*.38-300)/1.3/10)*10)+" g cơm chín kèm món này.";
+L.slice(0,10).forEach(function(x){var ms=x.d[1].filter(function(g){return x.m.indexOf(g)<0});
+h+='<div class="card"><b>'+x.d[0]+'</b> <small>~'+x.d[2]+' kcal</small><br>✓ Có: '+x.m.join(", ")+(ms.length?'<br><small>Thiếu: '+ms.join(", ")+' (có thể đổi tương đương hoặc bỏ)</small>':'<br><small>Đủ nguyên liệu</small>')+'<br><small>'+hint+'</small></div>'});
+document.getElementById("res").innerHTML=it.length?(h||'<div class="warn">Chưa khớp món nào. Thử thêm nguyên liệu như trứng, đậu phụ, rau, thịt, cá.</div>'):""}
+function shared(){var a=calc(P[0]),b=calc(P[1]);function rc(t,f){return Math.max(60,Math.round((t*f-300)/1.3/10)*10)}
+function pg(p,f){return Math.max(80,Math.round((p*f-8)/.2/10)*10)}
+var h='<div class="card"><b>Một thực đơn chung cho cả nhà</b><br><small>Anh ~'+a.t+' kcal/ngày · Chị ~'+b.t+' kcal/ngày. Mọi người ăn cùng món, chỉ khác lượng ăn. Người lớn không ăn bữa phụ nên calo chia cho 3 bữa chính. 👶 = bé ăn ở nhà (≈ ⅓ phần người lớn, nấu mềm, múc ra trước khi nêm mặn). Bé ăn sáng và trưa ở lớp từ T2 đến T7.</small></div><div class="card scroll"><table><tr><th></th><th>Sáng</th><th>Trưa</th><th>Tối</th><th>Xế (chỉ bé)</th></tr>';
+for(var d=0;d<7;d++){var k=d==6?" 👶":"";h+='<tr><td><b>'+DAYS[d]+'</b></td><td>'+SANG[d]+'<br><small>Anh ×'+(Math.round(a.t*.28/400*4)/4)+' · Chị ×'+(Math.round(b.t*.28/400*4)/4)+k+'</small></td><td>'+TRUA[d]+'<br><small>Cơm: Anh '+rc(a.t,.38)+' · Chị '+rc(b.t,.38)+' g'+k+'</small><br><small>Đạm sống: Anh '+pg(a.pr,.4)+' · Chị '+pg(b.pr,.4)+' g</small></td><td>'+TOI[d]+'<br><small>Cơm: Anh '+rc(a.t,.34)+' · Chị '+rc(b.t,.34)+' g 👶</small><br><small>Đạm sống: Anh '+pg(a.pr,.35)+' · Chị '+pg(b.pr,.35)+' g</small></td><td>'+BX[d]+' <small>👶</small></td></tr>'}
+return h+'</table></div><div class="card"><b>Phần mặn: đi chợ và nấu mỗi bữa trưa hoặc tối</b><br><small>Cho 2 người lớn: thịt/cá/đậu phụ khoảng '+(pg(a.pr,.4)+pg(b.pr,.4))+' g (cân sống, bỏ xương; 2 quả trứng ≈ 60 g thịt, 200 g đậu phụ ≈ 100 g thịt), rau khoảng 400 g (200 g/người), cơm chín khoảng '+(rc(a.t,.38)+rc(b.t,.38))+' g. Có bé ăn thì thêm khoảng 40 g đạm, 80 g rau, 50 g cơm.</small></div><ul><li>Nấu một nồi chung, múc phần của bé ra trước khi nêm mặn.</li><li>Cơm tính theo gram cơm chín (100 g ≈ 130 kcal), giả định phần món mặn khoảng 300 kcal, nấu ít dầu. Một bát cơm xới vừa đầy khoảng 150 g, nên cân thử 1 lần với bát nhà bạn. Đổi món theo nguyên liệu đang có ở tab 🍳 Nấu gì?</li></ul>'}
+function draw(){try{localStorage.setItem("tdgd",JSON.stringify(P))}catch(e){}tabs();var t=P[cur].t;document.getElementById("out").innerHTML=t=="k"?kid():t=="c"?cook():t=="s"?shared():adult(cur);if(t=="c")res()}
+try{var sv=JSON.parse(localStorage.getItem("tdgd")||"null");if(sv)sv.forEach(function(s,i){if(P[i]&&s)Object.assign(P[i],s)})}catch(e){}
+draw();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
+</script></body></html>
